@@ -11,21 +11,19 @@ MongoClient.connect(connectionURL, { useNewUrlParser: true, useUnifiedTopology: 
   }
 
   const db = client.db(databaseName);
-  
-  db.collection("users").findOne({ name: "James" }, (error, user) => {
-    if (error) {
-      return console.log(error);
+
+  updatePromise = db.collection('tasks').updateMany(
+    {
+      completed: false
+    },
+    {
+      $set: { completed: true },
     }
+  );
 
-    console.log(user);
-  });
-
-  db.collection('users').find({age: 38}).toArray((error, users) => {
-    if (error) {
-      return console.log('Can not return user')
-    }
-
-    console.log(users)
+  updatePromise.then((user) => {
+    console.log(user)
+  }).catch((error) => {
+    console.log(error)
   })
-
 });
