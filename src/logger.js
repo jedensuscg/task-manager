@@ -7,7 +7,7 @@ const requestLogger = createLogger({
   format: combine(timestamp(), logFormat),
   transports: [
     new transports.File({
-      filename: "requests.log",
+      filename: "logs/requests.log",
       format: format.json(),
     }),
   ],
@@ -30,11 +30,11 @@ const logger = createLogger({
   format: combine(logFormat, timestamp()),
   transports: [
     new transports.File({
-      filename: "combined.log",
+      filename: "logs/combined.log",
       format: format.json(),
     }),
   ],
-  exceptionHandlers: [new transports.File({ filename: "exceptions.log" })],
+  exceptionHandlers: [new transports.File({ filename: "logs/exceptions.log" })],
 });
 
 if (process.env.NODE_ENV !== "production") {
