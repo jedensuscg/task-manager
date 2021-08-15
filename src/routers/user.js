@@ -27,6 +27,15 @@ router.post("/users", async (req, res) => {
   }
 });
 
+router.post("/users/login", async (req, res) => {
+  try {
+    const user = await User.FindByCredentials(req.body.email, req.body.password, req.ip)
+    res.send(user)
+  } catch (error) {
+    res.status(400).send(error.message)
+  }
+})
+
 // Get All Users
 router.get("/users", async (req, res) => {
   const ip = req.ip;
