@@ -2,6 +2,7 @@ const mongoose = require("mongoose");
 const validator = require('validator')
 const bcrypt = require('bcrypt')
 const { logger, requestLogger } = require("../logger");
+const jwt = require('jsonwebtoken')
 
 const userSchema = new mongoose.Schema({
   name: {
@@ -40,9 +41,28 @@ const userSchema = new mongoose.Schema({
         throw new Error('Password can not contain "password" ')
       }
     }
-
-  }
+  },
+  tokens: [{
+    token: {
+      type: String,
+      required: true,
+    }
+  }]
 })
+
+userSchema.methods.generateAuthToken = async function () {
+
+  try {
+    const user = this
+    const token = jwt.sign({_id: user.id.toString()}, "stargateSG1")
+  
+    user.tokens = user.tokens.concat({ token })
+    await user.save()
+    return token
+  } catch (error) {
+    logger.error(error)
+  }
+}
 
 userSchema.statics.FindByCredentials = async (email, password, ip) => {
   const user = await User.findOne({email})

@@ -3,19 +3,21 @@ const router = new express.Router()
 const User = require('../models/user')
 const { logger, requestLogger } = require("../logger");
 
-// Post New User
+// Post New User 
 router.post("/users", async (req, res) => {
   const ip = req.ip;
   const user = new User(req.body);
   try {
     await user.save();
+    const token = await user.generateAuthToken()
     requestLogger.log({
       method: 'USER POST',
       level: "info",
       message: `User POST request from Ip Address ${ip}`,
-      meta: {data: user}
+      meta: {data: user} 
     });
-    res.status(201).send(user);
+
+    res.status(201).send({user, token});
   } catch (error) {
     requestLogger.log({
       method: 'USER POST',
@@ -30,8 +32,10 @@ router.post("/users", async (req, res) => {
 router.post("/users/login", async (req, res) => {
   try {
     const user = await User.FindByCredentials(req.body.email, req.body.password, req.ip)
-    res.send(user)
+    const token = await user.generateAuthToken()
+    res.send({user, token})
   } catch (error) {
+    
     res.status(400).send(error.message)
   }
 })
